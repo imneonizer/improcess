@@ -8,7 +8,7 @@ This tiny little python module is useful for creating multiple process of any fu
 
 ### Warning
 
-if your tasks require to do more than 4 tasks to do in parallel, kindly don't use improcess as [imthread](https://github.com/imneonizer/imthread) is fast and reliable for huge parallelization using only single core. however while bench marking i have found that i was trying to do 1 million small tasks in parallel and imthread was not sufficient neither improcess because of limited number of cores. then i did a duo compilation of these two libraries to create 5 multi process with each 2,00, 000 threads and that took half the time than creating 1 million threads on single process alone, and not to mention since my computer had only 4 cores making more than 4 processes at once doesn't seems efficient, those 1 million small tasks completed in 3 minutes. i'll update the link for the code.
+if your tasks require to do more than 4 tasks to do in parallel, kindly don't use improcess as [imthread](https://github.com/imneonizer/imthread) is fast and reliable for huge parallelization using only single core. however while bench marking i have found that i was trying to do 1 million small tasks in parallel and imthread was not sufficient neither improcess because of limited number of cores. then i did a duo compilation of these two libraries to create 5 multi process with each 2,00, 000 threads and that took half the time than creating 1 million threads on single process alone, i tested it on google cloud those 1 million small tasks completed in 3 minutes, see the code in the last section.
 
 #### Latest v1.0
 
@@ -201,3 +201,52 @@ if you don't use ``improcess.stop()`` function then the processes will keep on r
 #### Similar Module
 
 Also if your process are I/O bound you can use a similar library [imthread](https://github.com/imneonizer/imthread) which runs inside only one process and create multiple threads, and advantage of using multi threads over multi process is that you can share your memory space in between other threads.
+
+#### Balanced use of improcess and imthread
+
+I tride to do this awesome fun experiment with both the libraries and the take away is try to use imthread as much as you can and once its limits are reached use improcess to boost its capabilities by spawing a new process. we are going to encrypt a piece of text with different password for a million time. i used [imcrypt](https://github.com/imneonizer/imcrypt), an awesome library for any kind of file encryption in python. For the experiment below please install required libraries:
+
+````python
+pip install imthread
+pip install improcess
+pip install imcrypt
+````
+
+**Here's the source code**
+````python
+import imcrypt
+from imcrypt.imcrypt import ImCrypt
+import time
+import imthread
+import improcess
+import random
+
+text = 'hello world'
+
+def my_func_p(data):
+    def my_func_t(data):
+        original = text
+        key = ImCrypt.generate_unique_key(0)
+        encrypted = imcrypt.encrypt(original, key=key)
+        return encrypted, key, original
+
+    processed_data = imthread.start(my_func_t, repeat=total_threads, max_threads=10000)
+    return processed_data
+
+total_threads = 50000
+total_process = 20
+if __name__ == '__main__':
+    processed_data = improcess.start(my_func_p, repeat=total_process, max_process=4)
+    for data_p in processed_data:
+        for data in data_p:
+            encrypted, key, original = data[0], data[1], data[2]
+            print(f"Encrypted: '{encrypted}' Key: '{key}' Original: '{original}'")
+
+    print(f"Elapsed: {improcess.elapsed()} sec for {total_threads*total_process} Encryption")
+````
+
+#### Output
+````
+Elapsed: 120.67 sec for 1000000 Encryption
+````
+so, it took 2 minutes to encrypt a text with different passwords 1 million times. I know it sound too good to be true but its real now you can try to do the same stuff with using imthread only and see the time difference it will take 4 times of 2 minutes.
