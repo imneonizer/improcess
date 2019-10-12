@@ -25,9 +25,16 @@ class multi_processing():
                 print(e)
         finally:
             return (success, data[0], processed_data)
-    
+
     def start(self, raw_data):
-        process_count = len(raw_data)
+
+        if type(raw_data) == int:
+            pseudo_infinity = raw_data
+            process_count = raw_data
+        else:
+            pseudo_infinity = len(raw_data)
+            process_count = len(raw_data)
+
         if process_count < self.max_process:
             self.max_process = process_count
 
@@ -38,8 +45,14 @@ class multi_processing():
         final_result = []
         #marking each process with a index id
         try:
-            for i in range(1, process_count+1):
-                args.append((i, raw_data[i-1], self.process))
+            for i in range(1, pseudo_infinity+1):
+                try:
+                    index_data = raw_data[i-1]
+                except Exception:
+                    index_data = i
+
+                args.append((i, index_data, self.process))
+
                 if i%self.max_process == 0:
                     #starting processes
                     result = pool.map(self.process_data, args) #internal_processing_func, arguments_list

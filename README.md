@@ -6,7 +6,13 @@ pip install improcess
 
 This tiny little python module is useful for creating multiple process of any function in seconds.
 
-#### Latest v0.1.0
+### Warning
+
+if your tasks require to do more than 4 tasks to do in parallel, kindly don't use improcess as [imthread](https://github.com/imneonizer/imthread) is fast and reliable for huge parallelization using only single core. however while bench marking i have found that i was trying to do 1 million small tasks in parallel and imthread was not sufficient neither improcess because of limited number of cores. then i did a duo compilation of these two libraries to create 5 multi process with each 2,00, 000 threads and that took half the time than creating 1 million threads on single process alone, and not to mention since my computer had only 4 cores making more than 4 processes at once doesn't seems efficient, those 1 million small tasks completed in 3 minutes. i'll update the link for the code.
+
+#### Latest v1.0
+
+A quick launch mode is added, just type `improcess.start(func_name, repeat=10)` and it will execute the given function given number of times in parallel. A standard way of measuring elapsed time is added as well. see examples below to understand how to use quick launch mode.
 
 Other than that to keep a track on how many processes are been created in real time you can push in a new log method in your processing function so that whenever a new process is created you can see it. there are two methods of tracking them.
 
@@ -34,24 +40,18 @@ So what this module does is, at the time of object initialization it takes in th
 import improcess
 import time
 
-def my_func(i):
+def my_func(data):
     process = improcess.console_log(output=True)
-    try:
-        time.sleep(5)
-        return i*100
-    except Exception as e:
-        improcess.stop()
-        
+    time.sleep(5)
+    return data*100
+
+#list of input data for processing
+raw_data = [1,2,3,4,5,6,7,8,9,10]
 
 if __name__ == '__main__':
-    multi_processing = improcess.multi_processing(my_func, max_process=10)
-    raw_data = list(range(10))
-
-    st = time.time()
-    result = multi_processing.start(raw_data)
-    et = round((time.time() - st),2)
+    result = improcess.start(my_func, repeat=10, max_process=10)
     print(f'Result: {result}')
-    print(f'Elapsed time: {et} sec')
+    print(f'>>> Elapsed time: {improcess.elapsed()} sec')
 ```
 
 #### output
@@ -73,11 +73,19 @@ Elapsed time: 5.53 sec
 
 Now you can clearly see, if we do it without multi processing it would have taken around ``50 Seconds`` for processing the data while doing the task one by one and waiting for ``5 Sec`` after running the function each time. but since we are doing it with multiprocessing it will take only ``5 Seconds``  for processing the same task with different data, in their individual process.
 
+**one thing to take care is:** always execute the improcess.start() as
+
+````
+if __name__ == "__main__":
+	improcess.start()
+````
+
+It is essential to prevent improcess from creating its own duplicate process.
+
 #### Example 2
 
 ````python
 import improcess
-import time
 import requests
 
 #the function for processing data
@@ -87,21 +95,13 @@ def my_func(data):
     return data
 
 if __name__ == '__main__':
-    #building a imthreading object
-    multi_processing = improcess.multi_processing(my_func, max_process=20)
-
-    raw_data = list(range(1,21))
-
-    st = time.time()
-    
     #sending arguments for asynchronous multi processing
-    processed_data = multi_processing.start(raw_data)
+    processed_data = improcess.start(my_func, repeat=20, max_process=20)
 
     #printing the synchronised received results
-    print()
-    #print('>> Input: {}'.format(raw_data))
-    print('>> Result: {}'.format(processed_data))
-    print('>> Elapsed time: {} sec'.format(round((time.time()-st),2)))
+    print(f'>> Result: {processed_data}')
+
+    improcess.elapsed(output=True)
 ````
 
 #### output
@@ -129,7 +129,7 @@ if __name__ == '__main__':
 >>> Creating Process 20
 
 >> Result: [<Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>, <Response [200]>]
->> Elapsed time: 6.51 sec
+>>> Elapsed time: 5.92 sec
 ````
 
 In this example we didn't used `time.sleep()` instead we make a request to the webserver and it took ``0.5 seconds`` to get the result back so we did it 20 times with multi processing and were able to receive the results in less time in a synchronous order.
@@ -150,6 +150,34 @@ we can specify that at once how many process should be created so lets change th
 It is clear that every request to the server was taking approx. ``0.5 seconds`` so while making one request at a time it took ``10.19 seconds`` as expected.
 
 Though Expected Elapsed time is little bit slow in comparison to [imthread](https://github.com/imneonizer/imthread) library because in multi process each process have their own individual console and memory space. but both of these libraries can be used in conjunction to achieve ultra fast processing, instance we can create 4 individual processes and with every process we can call create 1000 threads. so it will be lot faster than using only [imthread](https://github.com/imneonizer/imthread) individually or [improcess](https://github.com/imneonizer/improcess) individually.
+
+### Example 3
+
+Quick Launch mode, a new feature is added where you can directly use improcess to pass in the repetitive function, input data for those functions and how many threads you want it to create at a time. other than that if you just want it to repeat the function without any inputs you can do that too.
+
+### output
+
+````python
+import improcess
+import random
+import time
+
+names = ['April', 'May']
+
+#the function for processing data
+def my_func(data):
+    improcess.console_log(output=True)
+    name = random.choice(names)
+    time.sleep(1)
+    return f'{name} says, Hello World!'
+
+if __name__=="__main__":
+    processed_data = improcess.start(my_func, repeat=4)
+    print(processed_data)
+    improcess.elapsed(output=True)
+````
+
+we kept a time gap of 1 sec inside the function still it repeated the task 4 times in same time. since it can access the global variables we can assign certain tasks that don't need different inputs every time.
 
 #### Handling errors and killing all process
 
