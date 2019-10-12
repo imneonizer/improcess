@@ -247,6 +247,9 @@ if __name__ == '__main__':
 
 #### Output
 ````
+.
+.
+.
 Elapsed: 120.67 sec for 1000000 Encryption
 ````
 so, it took 2 minutes to encrypt a text with different passwords 1 million times. I know it sound too good to be true but its real now you can try to do the same stuff with using imthread only and see the time difference it will take 4 times of 2 minutes.
