@@ -8,7 +8,7 @@ This tiny little python module is useful for creating multiple process of any fu
 
 ### Warning
 
-if your tasks require to do more than 4 tasks to do in parallel, kindly don't use improcess as [imthread](https://github.com/imneonizer/imthread) is fast and reliable for huge parallelization using only single core. however while bench marking i have found that i was trying to do 1 million small tasks in parallel and imthread was not sufficient neither improcess because of limited number of cores. then i did a duo compilation of these two libraries to create 5 multi process with each 2,00, 000 threads and that took half the time than creating 1 million threads on single process alone, i tested it on google cloud those 1 million small tasks completed in 3 minutes, see the code in the last section.
+if your tasks require to do more than 4 tasks in parallel, kindly don't use improcess as [imthread](https://github.com/imneonizer/imthread) is fast and reliable for huge parallelization using only single core. however while bench marking i have found that i was trying to do 1 million small tasks in parallel and imthread was not sufficient neither improcess because of limited number of cores. then i did a duo compilation of these two libraries to create 20 multi process with each 50000 threads and that took half the time than creating 1 million threads on single process alone, i tested it on google cloud those 1 million small tasks completed in 2 minutes, see the code in the last section.
 
 #### Latest v1.0
 
