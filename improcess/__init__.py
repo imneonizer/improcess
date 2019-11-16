@@ -1,7 +1,11 @@
 from improcess.improcess import multi_processing, console_log
 import time
 
+__version__='1.1'
+__author__='Nitin Rai'
+
 st = 0
+#default start function for spawning process
 def start(processing_func, data=None, repeat=None, max_process=4):
     assert type(max_process) == int, 'max_process value should be an integer'
     assert max_process>0, 'max_process value cannot be less than 1'
@@ -21,6 +25,7 @@ def start(processing_func, data=None, repeat=None, max_process=4):
 
     else:
         print(f'data: {data}, repeat: {repeat}')
+
 
 def stop():
     raise Exception('stop_process')

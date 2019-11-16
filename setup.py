@@ -2,13 +2,13 @@ from distutils.core import setup
 setup(
   name = 'improcess',         # How you named your package folder (MyLib)
   packages = ['improcess'],   # Chose the same as "name"
-  version = '1.0',      # Start with a small number and increase it with every change you make
+  version = '1.1',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'This short little python module can help you with running your iteratable functions on multi process without any hassle of creating process by yourself.',   # Give a short description about your library
   author = 'Nitin Rai',                   # Type in your name
   author_email = 'mneonizer@gmail.com',      # Type in your E-Mail
   url = 'https://github.com/imneonizer/improcess',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/imneonizer/improcess/archive/v1.0.tar.gz',    # I explain this later on
+  download_url = 'https://github.com/imneonizer/improcess/archive/v1.1.tar.gz',    # I explain this later on
   keywords = ['Multi Processing', 'Synchronous Processing', 'Parallel execution'],   # Keywords that define your package best
   classifiers=[
     'Development Status :: 4 - Beta',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package

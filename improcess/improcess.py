@@ -37,6 +37,8 @@ class multi_processing():
 
         if process_count < self.max_process:
             self.max_process = process_count
+        elif process_count > multiprocessing.cpu_count():
+            self.max_process = multiprocessing.cpu_count()
 
         #number of process to create
         pool = multiprocessing.Pool(processes = process_count)
